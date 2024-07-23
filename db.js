@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
-//  const myUrl =process.env.DB_URL_LOCAL ;
-const myUrl=process.env.DB_URL;
+ const myUrl =process.env.DB_URL_LOCAL ;
+// const myUrl=process.env.DB_URL;
 mongoose.connect(myUrl)
     .then(() => {
         console.log('Connected to database');
