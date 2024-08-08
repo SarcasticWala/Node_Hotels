@@ -1,4 +1,5 @@
 const mongoose =require('mongoose');
+const bcrypt=require('bcrypt');
 //define the person schema
 const personSchema = new mongoose.Schema({
     name:{
@@ -39,6 +40,29 @@ const personSchema = new mongoose.Schema({
         type:String
     }
 });
+//pre mlw function for save operation
+personSchema.pre('save',async function(next){
+    const person =this;
+    if(!person.isModified('password')) return next();
+    try{
+        //hash pass genaration
+        const salt = await bcrypt.genSalt(10);
+        //hash pass
+        const hasPassword =await bcrypt.hash(person.password,salt);
+        //override the plain pass with the hased one
+        person.password = hasPassword;
+        next()
+    }catch(err){
+        return next(err);
+    }
+})
+personSchema.method.comparePassword = async function(candidatePassword) {
+    try{
+
+    }catch(err){
+        throw err;
+    }
+}
 //crating person model using the  schema
 const Person = mongoose.model('person',personSchema);
 module.exports=Person;

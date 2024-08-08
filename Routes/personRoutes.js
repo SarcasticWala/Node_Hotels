@@ -4,25 +4,7 @@ const router = express.Router();
 const Person = require('./../models/person');
 
 router.post('/', async (req, res) => {
-    // const data=req.body // Assuming the request body contains the person data
-    // const newPerson = new Person();//using the mongoose model
-
-    // //this process will take long time to execute so we just do another
-    // // newPerson.name=data.name;
-    // // newPerson.age=data.age;
-    // // newPerson.mobile=data.mobile;
-    // // newPerson.email=data.email;
-    // // newPerson.adress=data.adress;
-
-    // //also we wont use the call back function rather than we use async and await function so the error wont come
-    // newPerson.save((error,SavedPerson)=>{
-    // //   if(error){
-    // //     console.log('Error saving person:' ,error);
-    // //     res.status(500).json({error: 'Internal Server error'})
-    // //     }else{
-    // //       console.log('data saved succefully');
-    // //       res.status(200).json(SavedPerson);
-    // //     }
+    
     try {
         const data = req.body // Assuming the request body contains the person data
         const newPerson = new Person(data);//using the mongoose model
