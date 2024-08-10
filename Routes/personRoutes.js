@@ -1,19 +1,33 @@
 const express = require('express')
 const router = express.Router();
-
 const Person = require('./../models/person');
-
-router.post('/', async (req, res) => {
+const {jwtAuthMiddleware,generateToken}= require('./../jwt');
+// POST route to add a person
+router.post('/signup', async (req, res) => {
     
     try {
         const data = req.body // Assuming the request body contains the person data
-        const newPerson = new Person(data);//using the mongoose model
-        const SavedPerson = await newPerson.save();
+
+        // Create a new Person document using the Mongoose model
+        const newPerson = new Person(data);
+
+        // Save the new person to the database
+        const response  = await newPerson.save();
         console.log('data saved');
-        res.status(200).json(SavedPerson);
-    } catch (err) {
+
+        const payload = {
+            id: response .id,
+            username: response .username
+        }
+        console.log(JSON.stringify(payload));
+        const token = generateToken(payload);
+        console.log("Token is : ", token);
+
+        res.status(200).json({response : response , token: token});
+    }
+    catch(err){
         console.log(err);
-        res.status(500).json({ error: 'Internet Server Error' });
+        res.status(500).json({error: 'Internal Server Error'});
 
     }
 })
@@ -38,8 +52,8 @@ router.get('/:work', async (req, res) => {
 
             // Assuming you already have a Person model and MongoDB connection set up
             const persons = await Person.find({ work: workType });
-            console.log('response fetched');
-            // Send the list of persons with the specified work type as a JSON response
+            console.log('response  fetched');
+            // Send the list of persons with the specified work type as a JSON response 
             res.json(persons);
         } else {
             res.status(404).json({ error: 'Invalid work type' });
@@ -54,16 +68,16 @@ router.put('/:id', async (req, res) => {
         const personId = req.params.id;//Extract the id from the url parameter
         const updatedPersonData = req.body;// update data for the person
 
-        const response = await Person.findByIdAndUpdate(personId, updatedPersonData, {
+        const response  = await Person.findByIdAndUpdate(personId, updatedPersonData, {
             new: true,// return the update document
             runValidators: true,//run moongose validation
         })
-        if(!response){
+        if(!response ){
             return res.status(404).json({error: 'Person not found'}); 
         }
         console.log('data updated');
 
-        res.status(200).json(response);
+        res.status(200).json(response );
     }
     catch (err) {
         console.error('Error fetching persons:', error);
@@ -74,8 +88,8 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id',async (req,res)=>{
     try{
         const personId = req.params.id;
-        const response =await Person.findByIdAndDelete(personId);
-        if(!response){
+        const response  =await Person.findByIdAndDelete(personId);
+        if(!response ){
             return res.status(404).json({error: 'Person not found'}); 
         }
         console.log('data updated');
